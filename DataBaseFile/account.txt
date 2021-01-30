@@ -1,2 +1,9 @@
-admin@gmail.com
-12345
+for inter as admin 
+admin
+password:12345
+
+
+
+for inter as employee
+daniaessa87@outlook.com
+ password:12345

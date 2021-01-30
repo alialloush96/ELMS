@@ -103,7 +103,7 @@ $msg="Leave updated Successfully";
                                     <tbody>
 <?php 
 $lid=intval($_GET['leaveid']);
-$sql = "SELECT tblleaves.id as lid,tblemployees.FirstName,tblemployees.LastName,tblemployees.EmpId,tblemployees.id,tblemployees.Gender,tblemployees.Phonenumber,tblemployees.EmailId,tblleaves.LeaveType,tblleaves.ToDate,tblleaves.FromDate,tblleaves.Description,tblleaves.PostingDate,tblleaves.Status,tblleaves.AdminRemark,tblleaves.AdminRemarkDate from tblleaves join tblemployees on tblleaves.empid=tblemployees.id where tblleaves.id=:lid";
+$sql = "SELECT tblleaves.id as lid,tblemployees.FirstName,tblemployees.LastName,tblemployees.EmpId,tblemployees.id,tblemployees.Gender,tblemployees.Phonenumber,tblemployees.EmailId,tblleaves.LeaveType,tblleaves.leaveTime,tblleaves.ToDate,tblleaves.FromDate,tblleaves.Description,tblleaves.PostingDate,tblleaves.Status,tblleaves.AdminRemark,tblleaves.AdminRemarkDate from tblleaves join tblemployees on tblleaves.empid=tblemployees.id where tblleaves.id=:lid";
 $query = $dbh -> prepare($sql);
 $query->bindParam(':lid',$lid,PDO::PARAM_STR);
 $query->execute();
@@ -136,9 +136,15 @@ foreach($results as $result)
 
   <tr>
                                              <td style="font-size:16px;"><b>Leave Type :</b></td>
+      
                                             <td><?php echo htmlentities($result->LeaveType);?></td>
+      
+                                             <td style="font-size:16px;"><b>Leave Time . :</b> <?php echo htmlentities($result->leaveTime);?></td>
+    
                                              <td style="font-size:16px;"><b>Leave Date . :</b></td>
+      
                                             <td>From <?php echo htmlentities($result->FromDate);?> to <?php echo htmlentities($result->ToDate);?></td>
+      
                                             <td style="font-size:16px;"><b>Posting Date</b></td>
                                            <td><?php echo htmlentities($result->PostingDate);?></td>
                                         </tr>

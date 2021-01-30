@@ -1,9 +1,9 @@
 <?php
 // DB credentials.
 define('DB_HOST','localhost');
-define('DB_USER','elms');
-define('DB_PASS','ooxODqdrxNWOpVx9');
-define('DB_NAME','elms-db');
+define('DB_USER','root');
+define('DB_PASS','');
+define('DB_NAME','elms_updates2');
 // Establish database connection.
 try
 {

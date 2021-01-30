@@ -65,7 +65,7 @@ $results=$query->fetchAll(PDO::FETCH_OBJ);
 $unreadcount=$query->rowCount();?>
 
 
-                                <span class="badge"><?php echo htmlentities($unreadcount);?></span></a></li>
+                                <span class="badge"  id="noti_number"></span></a></li>
                             <li class="hide-on-med-and-up"><a href="javascript:void(0)" class="search-toggle"><i class="material-icons">search</i></a></li>
                         </ul>
                         
@@ -101,3 +101,20 @@ foreach($results as $result)
                     </div>
                 </nav>
             </header>
+
+            <script type="text/javascript">
+                function loadDoc() {
+                    setInterval(function(){
+                        var xhttp = new XMLHttpRequest();
+                        xhttp.onreadystatechange = function() {
+                            if (this.readyState == 4 && this.status == 200) {
+                                document.getElementById("noti_number").innerHTML = this.responseText;
+                            }
+                        };
+                        xhttp.open("GET", "data.php", true);
+                        xhttp.send();
+                    },1000);
+                }
+                loadDoc();
+            </script>
+

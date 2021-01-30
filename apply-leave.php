@@ -1,6 +1,9 @@
 <?php
+include('includes/config.php');
+include('includes/myFunctions.php');
 
-// Import PHPMailer classes into the global namespace
+
+///Import PHPMailer classes into the global namespace
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -11,7 +14,9 @@ require 'PHPMailer/SMTP.php';
 
 session_start();
 error_reporting(0);
-include('includes/config.php');
+
+
+
 if(strlen($_SESSION['emplogin'])==0)
     {
 header('location:index.php');
@@ -20,84 +25,52 @@ else{
 if(isset($_POST['apply']))
 {
 $empid=$_SESSION['eid'];
- $leavetype=$_POST['leavetype'];
-$fromdate=$_POST['fromdate'];
-$todate=$_POST['todate'];
+$leavetype=$_POST['leavetype'];
 $description=$_POST['description'];
+
+    $datetime=$_POST['datetime'];
+    $cometime=$_POST['cometime'];
+
+
 $status=0;
 $isread=0;
-if($fromdate > $todate){
+if($datetime > $cometime){
                 $error=" ToDate should be greater than FromDate ";
-           }
-$sql="INSERT INTO tblleaves(LeaveType,ToDate,FromDate,Description,Status,IsRead,empid) VALUES(:leavetype,:fromdate,:todate,:description,:status,:isread,:empid)";
-$query = $dbh->prepare($sql);
-$query->bindParam(':leavetype',$leavetype,PDO::PARAM_STR);
-$query->bindParam(':fromdate',$fromdate,PDO::PARAM_STR);
-$query->bindParam(':todate',$todate,PDO::PARAM_STR);
-$query->bindParam(':description',$description,PDO::PARAM_STR);
-$query->bindParam(':status',$status,PDO::PARAM_STR);
-$query->bindParam(':isread',$isread,PDO::PARAM_STR);
-$query->bindParam(':empid',$empid,PDO::PARAM_STR);
-$query->execute();
-$lastInsertId = $dbh->lastInsertId();
-if($lastInsertId)
-{
-
-  $mail = new PHPMailer;
-
-  $mail->isSMTP();                      // Set mailer to use SMTP
-  $mail->Host = 'smtp.gmail.com';       // Specify main and backup SMTP servers
-  $mail->SMTPAuth = true;               // Enable SMTP authentication
-  $mail->Username = '';   // SMTP username
-  $mail->Password = '';   // SMTP password
-  $mail->SMTPSecure = 'tls';            // Enable TLS encryption, `ssl` also accepted
-  $mail->Port = 587;
+ }else{
+   $sql="INSERT INTO tblleaves(LeaveType,Description,Status,IsRead,empid,leaveTime,comeTime) VALUES(:leavetype,:description,:status,:isread,:empid,:datetime,:cometime)";
+   $query = $dbh->prepare($sql);
+   $query->bindParam(':leavetype',$leavetype,PDO::PARAM_STR);
+   $query->bindParam(':datetime',$datetime,PDO::PARAM_STR);
+   $query->bindParam(':cometime',$cometime,PDO::PARAM_STR);
+   $query->bindParam(':description',$description,PDO::PARAM_STR);
+   $query->bindParam(':status',$status,PDO::PARAM_STR);
+   $query->bindParam(':isread',$isread,PDO::PARAM_STR);
+   $query->bindParam(':empid',$empid,PDO::PARAM_STR);
+   $query->execute();
+   $lastInsertId = $dbh->lastInsertId();
+   if($lastInsertId)
+   {
+     $mail = new PHPMailer;
+     $subject="Request ".$leavetype." Message";
+     $empname=$_SESSION['fname'].' '.$_SESSION['lname'];
+     $bodycontent='<h1>The Employee '.$empname.' Need To '.$leavetype.' </h1>';
+     $bodycontent2= '<p>The request leave will  start :  <b>'.$datetime.'</b> and finish : <b>'.$cometime.'</b> </p>';
 
 
-              // TCP port to connect to
+     sendEmail($mail,$_SESSION['emplogin'],$empname,'recipient@example.com','hanadiokla@gmail.com',$subject,$bodycontent,$bodycontent2);
+       $msg="Leave applied successfully";
+   }
+       else
+       {
+       $error="Something went wrong. Please try again";
+       }
 
-  // Sender info
-  $mail->setFrom('sender@codexworld.com', 'CodexWorld');
-  $mail->addReplyTo('reply@codexworld.com', 'CodexWorld');
-
-  // Add a recipient
-  $mail->addAddress('ali.alloush.official@gmail.com');
-
-  $mail->addCC('alialoush323@gmail.com');
-  //$mail->addBCC('bcc@example.com');
-
-  // Set email format to HTML
-  $mail->isHTML(true);
-
-  // Mail subject
-  $mail->Subject = 'Email from Localhost by CodexWorld';
-
-  // Mail body content
-  $bodyContent = '<h1>How to Send Email from Localhost using PHP by CodexWorld</h1>';
-  $bodyContent .= '<p>This HTML email is sent from the localhost server using PHP by <b>CodexWorld</b></p>';
-  $mail->Body    = $bodyContent;
-
-  // Send email
-  if(!$mail->send()) {
-      echo 'Message could not be sent. Mailer Error: '.$mail->ErrorInfo;
-  } else {
-      echo 'Message has been sent.';
-  }
-  // Add attachments
-  $mail->addAttachment('/var/tmp/file.tar.gz');
-  $mail->addAttachment('/assets/images', 'mountains1.png'); // Optional name
-
-$msg="Leave applied successfully";
+ }
 
 }
-else
-{
-$error="Something went wrong. Please try again";
-}
+?>
 
-}
 
-    ?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -119,7 +92,7 @@ $error="Something went wrong. Please try again";
         <link href="assets/css/alpha.min.css" rel="stylesheet" type="text/css"/>
         <link href="assets/css/custom.css" rel="stylesheet" type="text/css"/>
   <style>
-        .errorWrap {
+.errorWrap {
     padding: 10px;
     margin: 0 0 20px 0;
     background: #fff;
@@ -134,10 +107,10 @@ $error="Something went wrong. Please try again";
     border-left: 4px solid #5cb85c;
     -webkit-box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
     box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
-}
-        </style>
 
+    }
 
+  </style>
 
     </head>
     <body>
@@ -165,7 +138,7 @@ $error="Something went wrong. Please try again";
 
 
  <div class="input-field col  s12">
-<select  name="leavetype" autocomplete="off">
+<select  name="leavetype">
 <option value="">Select leave type...</option>
 <?php $sql = "SELECT  LeaveType from tblleavetype";
 $query = $dbh -> prepare($sql);
@@ -181,15 +154,21 @@ foreach($results as $result)
 </select>
 </div>
 
+<div class="input-field col s12">
+          <div class="form-group">
+            <label for="datetime">From Date</label>
+            <input type="text" class="form-control" id="datetime" name="datetime" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy HH:MM" data-inputmask-placeholder="dd/mm/yyyy  hh:mm"  required>
+          </div>
+</div>
 
-<div class="input-field col m6 s12">
-<label for="fromdate">From  Date</label>
-<input placeholder="" id="mask1" name="fromdate" class="masked" type="text" data-inputmask="'alias': 'date'" required>
+<div class="input-field col s12">
+<div class="form-group">
+<label for="birthdate">To Date</label>
+  <input type="text" class="form-control" id="cometime" name="cometime" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy HH:MM" data-inputmask-placeholder="dd/mm/yyyy  hh:mm" required>
 </div>
-<div class="input-field col m6 s12">
-<label for="todate">To Date</label>
-<input placeholder="" id="mask1" name="todate" class="masked" type="text" data-inputmask="'alias': 'date'" required>
+
 </div>
+
 <div class="input-field col m12 s12">
 <label for="birthdate">Description</label>
 
@@ -214,6 +193,7 @@ foreach($results as $result)
         </div>
         <div class="left-sidebar-hover"></div>
 
+
         <!-- Javascripts -->
         <script src="assets/plugins/jquery/jquery-2.2.0.min.js"></script>
         <script src="assets/plugins/materialize/js/materialize.min.js"></script>
@@ -221,8 +201,24 @@ foreach($results as $result)
         <script src="assets/plugins/jquery-blockui/jquery.blockui.js"></script>
         <script src="assets/js/alpha.min.js"></script>
         <script src="assets/js/pages/form_elements.js"></script>
-          <script src="assets/js/pages/form-input-mask.js"></script>
-                <script src="assets/plugins/jquery-inputmask/jquery.inputmask.bundle.js"></script>
+        <script src="assets/js/pages/form-input-mask.js"></script>
+        <script src="assets/plugins/jquery-inputmask/jquery.inputmask.bundle.js"></script>
+
+
+
+	     	<script>
+           $('input').inputmask();
+        </script>
+
+
+
+         <script type="textt/javascript">
+
+
+         </script>
+
+
+
     </body>
 </html>
 <?php } ?>

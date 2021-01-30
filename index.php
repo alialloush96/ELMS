@@ -7,7 +7,7 @@ if(isset($_POST['signin']))
 {
 $uname=$_POST['username'];
 $password=md5($_POST['password']);
-$sql ="SELECT EmailId,Password,Status,id FROM tblemployees WHERE EmailId=:uname and Password=:password";
+$sql ="SELECT EmailId,Password,Status,id,	FirstName,LastName FROM tblemployees WHERE EmailId=:uname and Password=:password";
 $query= $dbh -> prepare($sql);
 $query-> bindParam(':uname', $uname, PDO::PARAM_STR);
 $query-> bindParam(':password', $password, PDO::PARAM_STR);
@@ -18,13 +18,16 @@ if($query->rowCount() > 0)
  foreach ($results as $result) {
     $status=$result->Status;
     $_SESSION['eid']=$result->id;
+    $_SESSION['fname']=$result->FirstName;
+    $_SESSION['lname']=$result->LastName;
+
   }
 if($status==0)
 {
 $msg="Your account is Inactive. Please contact admin";
 } else{
 $_SESSION['emplogin']=$_POST['username'];
-echo "<script type='text/javascript'> document.location = 'emp-changepassword.php'; </script>";
+echo "<script type='text/javascript'> document.location = 'apply-leave.php'; </script>";
 } }
 
 else{

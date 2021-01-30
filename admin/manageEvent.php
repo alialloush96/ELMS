@@ -7,15 +7,32 @@ if(strlen($_SESSION['alogin'])==0)
 header('location:index.php');
 }
 else{
-if(isset($_GET['del']))
+// code for Inactive  employee
+if(isset($_GET['inid']))
 {
-$id=$_GET['del'];
-$sql = "delete from  tblleavetype  WHERE id=:id";
+$id=$_GET['inid'];
+$status=0;
+$sql = "update tblemployees set Status=:status  WHERE id=:id";
 $query = $dbh->prepare($sql);
 $query -> bindParam(':id',$id, PDO::PARAM_STR);
+$query -> bindParam(':status',$status, PDO::PARAM_STR);
 $query -> execute();
-$msg="Leave type record deleted";
+header('location:manageemployee.php');
+}
 
+
+
+//code for active employee
+if(isset($_GET['id']))
+{
+$id=$_GET['id'];
+$status=1;
+$sql = "update tblemployees set Status=:status  WHERE id=:id";
+$query = $dbh->prepare($sql);
+$query -> bindParam(':id',$id, PDO::PARAM_STR);
+$query -> bindParam(':status',$status, PDO::PARAM_STR);
+$query -> execute();
+header('location:manageemployee.php');
 }
  ?>
 <!DOCTYPE html>
@@ -23,7 +40,7 @@ $msg="Leave type record deleted";
     <head>
 
         <!-- Title -->
-        <title>Admin | Manage Leave Type</title>
+        <title>Admin | Manage Employees</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
         <meta charset="UTF-8">
@@ -67,27 +84,27 @@ $msg="Leave type record deleted";
             <main class="mn-inner">
                 <div class="row">
                     <div class="col s12">
-                        <div class="page-title">Manage Leave Type</div>
+                        <div class="page-title">Manage Events</div>
                     </div>
 
                     <div class="col s12 m12 l12">
                         <div class="card">
                             <div class="card-content">
-                                <span class="card-title">Leave Type Info</span>
+                                <span class="card-title">Event Info</span>
                                 <?php if($msg){?><div class="succWrap"><strong>SUCCESS</strong> : <?php echo htmlentities($msg); ?> </div><?php }?>
                                 <table id="example" class="display responsive-table ">
                                     <thead>
                                         <tr>
-                                            <th>Sr no</th>
-                                            <th>Leave Type</th>
-                                            <th>Description</th>
-                                            <th width='200'>Creation Date</th>
-                                            <th>Action</th>
+                                              <th>Sr no</th>
+                                              <th>Event Name</th>
+                                              <th>Employee Name</th>
+                                             <th>Event Date</th>
+                                              <th>Action</th>
                                         </tr>
                                     </thead>
 
                                     <tbody>
-<?php $sql = "SELECT * from tblleavetype";
+<?php $sql = "SELECT EmpId,FirstName,LastName,Department,Status,RegDate,id from  tblemployees";
 $query = $dbh -> prepare($sql);
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
@@ -98,11 +115,18 @@ foreach($results as $result)
 {               ?>
                                         <tr>
                                             <td> <?php echo htmlentities($cnt);?></td>
-                                            <td><?php echo htmlentities($result->LeaveType);?></td>
-                                            <td><?php echo htmlentities($result->Description);?></td>
-                                            <td><?php echo htmlentities($result->CreationDate);?></td>
-                                            <td><a href="editleavetype.php?lid=<?php echo htmlentities($result->id);?>"><i class="material-icons">mode_edit</i></a>
-                                            <a href="manageleavetype.php?del=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you want to delete');"> <i class="material-icons">delete_forever</i></a> </td>
+                                            <td><?php echo "event name"; ?></td>
+                                            <td><?php echo "employee name"; ?></td>
+                                            <td><?php echo "event date"; ?></td>
+
+                                            <td><a href="editemployee.php?empid=<?php echo htmlentities($result->id);?>"><i class="material-icons">mode_edit</i></a>
+                                        <?php if($result->Status==1)
+ {?>
+<a href="manageemployee.php?inid=<?php echo htmlentities($result->id);?>" onclick="return confirm('Are you sure you want to inactive this Employe?');"" > <i class="material-icons" title="Inactive">clear</i>
+<?php } else {?>
+
+                                            <a href="manageemployee.php?id=<?php echo htmlentities($result->id);?>" onclick="return confirm('Are you sure you want to active this employee?');""><i class="material-icons" title="Active">done</i>
+                                            <?php } ?> </td>
                                         </tr>
                                          <?php $cnt++;} }?>
                                     </tbody>

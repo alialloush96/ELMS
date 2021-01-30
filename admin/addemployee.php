@@ -2,8 +2,9 @@
 session_start();
 error_reporting(0);
 include('includes/config.php');
+include('includes/function.php');
 if(strlen($_SESSION['alogin'])==0)
-    {   
+    {
 header('location:index.php');
 }
 else{
@@ -11,19 +12,29 @@ if(isset($_POST['add']))
 {
 $empid=$_POST['empcode'];
 $fname=$_POST['firstName'];
-$lname=$_POST['lastName'];   
-$email=$_POST['email']; 
-$password=md5($_POST['password']); 
-$gender=$_POST['gender']; 
-$dob=$_POST['dob']; 
-$department=$_POST['department']; 
-$address=$_POST['address']; 
-$city=$_POST['city']; 
-$country=$_POST['country']; 
-$mobileno=$_POST['mobileno']; 
-$status=1;
+$lname=$_POST['lastName'];
+$email=$_POST['email'];
+$password=md5($_POST['password']);
+$gender=$_POST['gender'];
 
-$sql="INSERT INTO tblemployees(EmpId,FirstName,LastName,EmailId,Password,Gender,Dob,Department,Address,City,Country,Phonenumber,Status) VALUES(:empid,:fname,:lname,:email,:password,:gender,:dob,:department,:address,:city,:country,:mobileno,:status)";
+// $date = str_replace('/', '-', $_POST['dob']);
+$dob=setDate($_POST['dob']);
+
+
+
+$department=$_POST['department'];
+$address=$_POST['address'];
+$city=$_POST['city'];
+$country=$_POST['country'];
+$mobileno=$_POST['mobileno'];
+$Passport_valid=setDate($_POST['Passport_valid']);
+$idcard_valid=setDate($_POST['idcard_valid']);
+$Visa_valid=setDate($_POST['Visa_valid']);
+$status=1;
+echo $dob;
+
+
+$sql="INSERT INTO tblemployees(EmpId,FirstName,LastName,EmailId,Password,Gender,Dob,Department,Address,City,Country,Phonenumber,Status,Passport_valid,idcard_valid,Visa_valid) VALUES(:empid,:fname,:lname,:email,:password,:gender,:dob,:department,:address,:city,:country,:mobileno,:status,:Passport_valid,:idcard_valid,:Visa_valid)";
 $query = $dbh->prepare($sql);
 $query->bindParam(':empid',$empid,PDO::PARAM_STR);
 $query->bindParam(':fname',$fname,PDO::PARAM_STR);
@@ -38,13 +49,16 @@ $query->bindParam(':city',$city,PDO::PARAM_STR);
 $query->bindParam(':country',$country,PDO::PARAM_STR);
 $query->bindParam(':mobileno',$mobileno,PDO::PARAM_STR);
 $query->bindParam(':status',$status,PDO::PARAM_STR);
+$query->bindParam(':Passport_valid',$Passport_valid,PDO::PARAM_STR);
+$query->bindParam(':idcard_valid',$idcard_valid,PDO::PARAM_STR);
+$query->bindParam(':Visa_valid',$Visa_valid,PDO::PARAM_STR);
 $query->execute();
 $lastInsertId = $dbh->lastInsertId();
 if($lastInsertId)
 {
 $msg="Employee record added Successfully";
 }
-else 
+else
 {
 $error="Something went wrong. Please try again";
 }
@@ -56,20 +70,20 @@ $error="Something went wrong. Please try again";
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        
+
         <!-- Title -->
         <title>Admin | Add Employee</title>
-        
+
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
         <meta charset="UTF-8">
         <meta name="description" content="Responsive Admin Dashboard Template" />
         <meta name="keywords" content="admin,dashboard" />
         <meta name="author" content="FreeIT" />
-        
+
         <!-- Styles -->
         <link type="text/css" rel="stylesheet" href="../assets/plugins/materialize/css/materialize.min.css"/>
         <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link href="../assets/plugins/material-preloader/css/materialPreloader.min.css" rel="stylesheet"> 
+        <link href="../assets/plugins/material-preloader/css/materialPreloader.min.css" rel="stylesheet">
         <link href="../assets/css/alpha.min.css" rel="stylesheet" type="text/css"/>
         <link href="../assets/css/custom.css" rel="stylesheet" type="text/css"/>
   <style>
@@ -140,7 +154,7 @@ error:function (){}
     </head>
     <body>
   <?php include('includes/header.php');?>
-            
+
        <?php include('includes/sidebar.php');?>
    <main class="mn-inner">
                 <div class="row">
@@ -158,14 +172,14 @@ error:function (){}
                                                 <div class="row">
                                                     <div class="col m6">
                                                         <div class="row">
-     <?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php } 
+     <?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php }
                 else if($msg){?><div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php }?>
 
 
  <div class="input-field col  s12">
 <label for="empcode">Employee Code(Must be unique)</label>
 <input  name="empcode" id="empcode" onBlur="checkAvailabilityEmpid()" type="text" autocomplete="off" required>
-<span id="empid-availability" style="font-size:12px;"></span> 
+<span id="empid-availability" style="font-size:12px;"></span>
 </div>
 
 
@@ -182,7 +196,7 @@ error:function (){}
 <div class="input-field col s12">
 <label for="email">Email</label>
 <input  name="email" type="email" id="email" onBlur="checkAvailabilityEmailid()" autocomplete="off" required>
-<span id="emailid-availability" style="font-size:12px;"></span> 
+<span id="emailid-availability" style="font-size:12px;"></span>
 </div>
 
 <div class="input-field col s12">
@@ -196,12 +210,12 @@ error:function (){}
 </div>
 </div>
 </div>
-                                                    
+
 <div class="col m6">
 <div class="row">
 <div class="input-field col m6 s12">
 <select  name="gender" autocomplete="off">
-<option value="">Gender...</option>                                          
+<option value="">Gender...</option>
 <option value="Male">Male</option>
 <option value="Female">Female</option>
 <option value="Other">Other</option>
@@ -209,11 +223,13 @@ error:function (){}
 </div>
 
 <div class="input-field col m6 s12">
-<label for="birthdate">Birthdate</label>
-<input id="birthdate" name="dob" type="date" class="datepicker" autocomplete="off" >
+          <div class="form-group">
+            <label for="dob">Birth Date</label>
+            <input type="text" class="form-control" id="dob" name="dob" data-inputmask-alias="date" data-inputmask-inputformat="date" data-inputmask-placeholder="dd mm yyyy"  required>
+          </div>
 </div>
 
-                                                    
+
 
 <div class="input-field col m6 s12">
 <select  name="department" autocomplete="off">
@@ -226,7 +242,7 @@ $cnt=1;
 if($query->rowCount() > 0)
 {
 foreach($results as $result)
-{   ?>                                            
+{   ?>
 <option value="<?php echo htmlentities($result->DepartmentName);?>"><?php echo htmlentities($result->DepartmentName);?></option>
 <?php }} ?>
 </select>
@@ -241,19 +257,41 @@ foreach($results as $result)
 <label for="city">City/Town</label>
 <input id="city" name="city" type="text" autocomplete="off" required>
  </div>
-   
+
 <div class="input-field col m6 s12">
 <label for="country">Country</label>
 <input id="country" name="country" type="text" autocomplete="off" required>
 </div>
 
-                                                            
+
 <div class="input-field col s12">
 <label for="phone">Mobile number</label>
 <input id="phone" name="mobileno" type="tel" maxlength="10" autocomplete="off" required>
  </div>
 
-                                                        
+ <div class="input-field col m6 s12">
+   <div class="form-group">
+     <label for="Passport_valid">Passport Validation</label>
+     <input type="text" class="form-control" id="Passport_valid" name="Passport_valid" data-inputmask-alias="date" data-inputmask-inputformat="date" data-inputmask-placeholder="dd mm yyyy"  required>
+   </div>
+ </div>
+
+ <div class="input-field col m6 s12">
+   <div class="form-group">
+     <label for="idcard_valid">Card Validation</label>
+     <input type="text" class="form-control" id="idcard_valid" name="idcard_valid" data-inputmask-alias="date" data-inputmask-inputformat="date" data-inputmask-placeholder="dd mm yyyy"  required>
+   </div>
+ </div>
+
+ <div class="input-field col m6 s12">
+   <div class="form-group">
+     <label for="Visa_valid">Visa Validation</label>
+     <input type="text" class="form-control" id="Visa_valid" name="Visa_valid" data-inputmask-alias="date" data-inputmask-inputformat="date" data-inputmask-placeholder="dd mm yyyy"  required>
+   </div>
+ </div>
+
+
+
 <div class="input-field col s12">
 <button type="submit" name="add" onclick="return valid();" id="add" class="waves-effect waves-light btn indigo m-b-xs">ADD</button>
 
@@ -264,8 +302,8 @@ foreach($results as $result)
                                                 </div>
                                             </div>
                                         </section>
-                                     
-                                    
+
+
                                         </section>
                                     </div>
                                 </form>
@@ -276,7 +314,7 @@ foreach($results as $result)
             </main>
         </div>
         <div class="left-sidebar-hover"></div>
-        
+
         <!-- Javascripts -->
         <script src="../assets/plugins/jquery/jquery-2.2.0.min.js"></script>
         <script src="../assets/plugins/materialize/js/materialize.min.js"></script>
@@ -284,7 +322,14 @@ foreach($results as $result)
         <script src="../assets/plugins/jquery-blockui/jquery.blockui.js"></script>
         <script src="../assets/js/alpha.min.js"></script>
         <script src="../assets/js/pages/form_elements.js"></script>
-        
+        <script src="../assets/plugins/jquery-inputmask/jquery.inputmask.bundle.js"></script>
+
+
+
+        <script>
+           $('input').inputmask();
+        </script>
+
     </body>
 </html>
-<?php } ?> 
+<?php } ?>
