@@ -1,6 +1,6 @@
 <?php
 include('includes/config.php');
-include('includes/myFunctions.php');
+include('../includes/myFunctions.php');
 
 
 
@@ -8,9 +8,9 @@ include('includes/myFunctions.php');
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require 'PHPMailer/Exception.php';
-require 'PHPMailer/PHPMailer.php';
-require 'PHPMailer/SMTP.php';
+require '../PHPMailer/Exception.php';
+require '../PHPMailer/PHPMailer.php';
+require '../PHPMailer/SMTP.php';
 
 
 session_start();
@@ -51,8 +51,8 @@ if($datetime > $cometime){
    $lastInsertId = $dbh->lastInsertId();
    if($lastInsertId)
    {
-     $empname=$_SESSION['fname'].' '.$_SESSION['lname'];
      $mail = new PHPMailer;
+     $empname=$_SESSION['fname'].' '.$_SESSION['lname'];
      $subject="Request ".$leavetype." Message";
      $bodycontent='<h1>The Employee '.$empname.' Need To '.$leavetype.' </h1>';
      $bodycontent2= '<p>The request leave will  start :  <b>'.$datetime.'</b> and finish : <b>'.$cometime.'</b> </p>';
@@ -88,11 +88,11 @@ if($datetime > $cometime){
         <meta name="author" content="FreeIT" />
 
         <!-- Styles -->
-        <link type="text/css" rel="stylesheet" href="assets/plugins/materialize/css/materialize.min.css"/>
+        <link type="text/css" rel="stylesheet" href="../assets/plugins/materialize/css/materialize.min.css"/>
         <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link href="assets/plugins/material-preloader/css/materialPreloader.min.css" rel="stylesheet">
-        <link href="assets/css/alpha.min.css" rel="stylesheet" type="text/css"/>
-        <link href="assets/css/custom.css" rel="stylesheet" type="text/css"/>
+        <link href="../assets/plugins/material-preloader/css/materialPreloader.min.css" rel="stylesheet">
+        <link href="../assets/css/alpha.min.css" rel="stylesheet" type="text/css"/>
+        <link href="../assets/css/custom.css" rel="stylesheet" type="text/css"/>
   <style>
 .errorWrap {
     padding: 10px;
@@ -197,14 +197,14 @@ foreach($results as $result)
 
 
         <!-- Javascripts -->
-        <script src="assets/plugins/jquery/jquery-2.2.0.min.js"></script>
-        <script src="assets/plugins/materialize/js/materialize.min.js"></script>
-        <script src="assets/plugins/material-preloader/js/materialPreloader.min.js"></script>
-        <script src="assets/plugins/jquery-blockui/jquery.blockui.js"></script>
-        <script src="assets/js/alpha.min.js"></script>
-        <script src="assets/js/pages/form_elements.js"></script>
-        <script src="assets/js/pages/form-input-mask.js"></script>
-        <script src="assets/plugins/jquery-inputmask/jquery.inputmask.bundle.js"></script>
+        <script src="../assets/plugins/jquery/jquery-2.2.0.min.js"></script>
+        <script src="../assets/plugins/materialize/js/materialize.min.js"></script>
+        <script src="../assets/plugins/material-preloader/js/materialPreloader.min.js"></script>
+        <script src="../assets/plugins/jquery-blockui/jquery.blockui.js"></script>
+        <script src="../assets/js/alpha.min.js"></script>
+        <script src="../assets/js/pages/form_elements.js"></script>
+        <script src="../assets/js/pages/form-input-mask.js"></script>
+        <script src="../assets/plugins/jquery-inputmask/jquery.inputmask.bundle.js"></script>
 
 
 

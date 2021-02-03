@@ -5,13 +5,13 @@
                             <img src="../assets/images/profile-image.png" class="circle" alt="">
                         </div>
                         <div class="sidebar-profile-info">
-                       
+
                                 <p>Admin</p>
 
-                         
+
                         </div>
                     </div>
-            
+
                 <ul class="sidebar-menu collapsible collapsible-accordion" data-collapsible="accordion">
                     <li class="no-padding"><a class="waves-effect waves-grey" href="dashboard.php"><i class="material-icons">settings_input_svideo</i>Dashboard</a></li>
                     <li class="no-padding">
@@ -38,7 +38,18 @@
                             <ul>
                                 <li><a href="addemployee.php">Add Employee</a></li>
                                 <li><a href="manageemployee.php">Manage Employee</a></li>
-       
+
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="no-padding">
+                        <a class="collapsible-header waves-effect waves-grey"><i class="material-icons">event</i>Events<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="addEvent.php">Add Event</a></li>
+                                <li><a href="manageEvent.php">Manage Event</a></li>
+
                             </ul>
                         </div>
                     </li>
@@ -51,25 +62,42 @@
                                 <li><a href="pending-leavehistory.php">Pending Leaves </a></li>
                                 <li><a href="approvedleave-history.php">Approved Leaves</a></li>
                                   <li><a href="notapproved-leaves.php">Not Approved Leaves</a></li>
-       
+
                             </ul>
                         </div>
                     </li>
 
 
+                    <li class="no-padding">
+                        <a class="collapsible-header waves-effect waves-grey"><i class="material-icons">assignment</i>Report<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="">Employee</a></li>
+                                <li><a href="">Events</a></li>
+
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="no-padding">
+                            <a class="waves-effect waves-grey" href="changepassword.php"><i class="material-icons">admin_panel_settings</i>Change Information</a>
+                        </li>
 
 
                         <li class="no-padding">
-                                <a class="waves-effect waves-grey" href="logout.php"><i class="material-icons">exit_to_app</i>Sign Out</a>
-                            </li>  
-                 
+                                <a class="waves-effect waves-grey" href="backup.php"><i class="material-icons">backup</i>Backup Data</a>
+                            </li>
 
-                 
-              
+
+                    <li class="no-padding">
+                        <a class="waves-effect waves-grey" href="logout.php"><i class="material-icons">exit_to_app</i>Sign Out</a>
+                    </li>
+
+
                 </ul>
                    <div class="footer">
                     <p class="copyright">All Right Saved<a href="#">FreeIT-Group </a>©</p>
-                
+
                 </div>
                 </div>
             </aside>

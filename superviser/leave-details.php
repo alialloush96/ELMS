@@ -1,10 +1,20 @@
 <?php
+include('../includes/myFunctions.php');
+
+///Import PHPMailer classes into the global namespace
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require '../PHPMailer/Exception.php';
+require '../PHPMailer/PHPMailer.php';
+require '../PHPMailer/SMTP.php';
+
 session_start();
 error_reporting(0);
 include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
+if(strlen($_SESSION['emplogin'])==0 || $_SESSION['roll']==0)
     {
-header('location:index.php');
+header('location:../index.php');
 }
 else{
 
@@ -19,6 +29,8 @@ $query->bindParam(':isread',$isread,PDO::PARAM_STR);
 $query->bindParam(':did',$did,PDO::PARAM_STR);
 $query->execute();
 
+
+$email;
 // code for action taken on leave
 if(isset($_POST['update']))
 {
@@ -35,6 +47,36 @@ $query->bindParam(':admremarkdate',$admremarkdate,PDO::PARAM_STR);
 $query->bindParam(':did',$did,PDO::PARAM_STR);
 $query->execute();
 $msg="Leave updated Successfully";
+$mail = new PHPMailer;
+$empname=$_SESSION['fname'].' '.$_SESSION['lname'];
+if($status==1){
+  $adminemail="";
+  $sql = "SELECT email  from  admin";
+  $query = $dbh -> prepare($sql);
+  $query->execute();
+  $results=$query->fetchAll(PDO::FETCH_OBJ);
+  $cnt=1;
+  if($query->rowCount() > 0)
+  {
+  foreach($results as $result)
+      {
+        $adminemail=$result->email;
+      }
+  }
+  $subject="The leave approved";
+  $bodycontent='<h1>The Employee '.$empname.' approved the leave request </h1>';
+  $bodycontent2= '<p>Dear employee, your leave request was approved on time, Please refer to the system for details.</p>';
+  $email=$_POST['email'];
+  sendEmailToEmp($mail,$adminemail,'Center',$subject,$bodycontent,$bodycontent2);
+}elseif($status==2){
+  $subject="The Leave Not Approved";
+  $bodycontent='<h1>The Employee '.$empname.'did not approved the leave request </h1>';
+  $bodycontent2= '<p>Dear employee, your leave request was not approved, Please refer to the system for details.</p>';
+  $email=$_POST['email'];
+  sendEmailToEmp($mail,$email,'Center',$subject,$bodycontent,$bodycontent2);
+}//end if Status
+
+
 }
 
 
@@ -208,8 +250,11 @@ if($stats==0)
                                             <option value="">Choose your option</option>
                                             <option value="1">Approved</option>
                                             <option value="2">Not Approved</option>
+
                                         </select></p>
                                         <p><textarea id="textarea1" name="description" class="materialize-textarea" name="description" placeholder="Description" length="500" maxlength="500" required></textarea></p>
+                                        <input id='email' name="email" value="<?php  $email=$result->EmailId; echo htmlentities($result->EmailId);?>" hidden='hiddend' >
+
     </div>
     <div class="modal-footer" style="width:90%">
        <input type="submit" class="waves-effect waves-light btn blue m-b-xs" name="update" value="Submit">

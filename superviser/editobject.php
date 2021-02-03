@@ -2,28 +2,36 @@
 session_start();
 error_reporting(0);
 include('includes/config.php');
-if(strlen($_SESSION['alogin'])==0)
+if(strlen($_SESSION['emplogin'])==0 || $_SESSION['roll']==0 )
     {
 header('location:index.php');
 }
 else{
-if(isset($_GET['del']))
+if(isset($_POST['update']))
 {
-$id=$_GET['del'];
-$sql = "delete from  tblleavetype  WHERE id=:id";
+$obid=intval($_GET['obid']);
+$objectname=$_POST['objectname'];
+$description=$_POST['description'];
+$sql="update objects set object_name=:objectname,description=:description where id=$obid";
 $query = $dbh->prepare($sql);
-$query -> bindParam(':id',$id, PDO::PARAM_STR);
-$query -> execute();
-$msg="Leave type record deleted";
-
+$query->bindParam(':objectname',$objectname,PDO::PARAM_STR);
+$query->bindParam(':description',$description,PDO::PARAM_STR);
+$query->execute();
+if($query->execute()){
+   $msg="Object updated Successfully" ;
+}else {
+   $error="Object did'nt update Successfully try again";
 }
- ?>
+}
+
+    ?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
 
         <!-- Title -->
-        <title>Admin | Manage Leave Type</title>
+        <title>Admin | Update Department</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
         <meta charset="UTF-8">
@@ -36,12 +44,9 @@ $msg="Leave type record deleted";
         <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link href="../assets/plugins/material-preloader/css/materialPreloader.min.css" rel="stylesheet">
         <link href="../assets/plugins/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
-
-
-        <!-- Theme Styles -->
         <link href="../assets/css/alpha.min.css" rel="stylesheet" type="text/css"/>
         <link href="../assets/css/custom.css" rel="stylesheet" type="text/css"/>
-<style>
+  <style>
         .errorWrap {
     padding: 10px;
     margin: 0 0 20px 0;
@@ -61,34 +66,27 @@ $msg="Leave type record deleted";
         </style>
     </head>
     <body>
-       <?php include('includes/header.php');?>
+  <?php include('includes/header.php');?>
 
        <?php include('includes/sidebar.php');?>
             <main class="mn-inner">
                 <div class="row">
                     <div class="col s12">
-                        <div class="page-title">Manage Leave Type</div>
+                        <div class="page-title">Update Department</div>
                     </div>
-
-                    <div class="col s12 m12 l12">
+                    <div class="col s12 m12 l6">
                         <div class="card">
                             <div class="card-content">
-                                <span class="card-title">Leave Type Info</span>
-                                <?php if($msg){?><div class="succWrap"><strong>SUCCESS</strong> : <?php echo htmlentities($msg); ?> </div><?php }?>
-                                <table id="example" class="display responsive-table ">
-                                    <thead>
-                                        <tr>
-                                            <th>Sr no</th>
-                                            <th>Leave Type</th>
-                                            <th>Description</th>
-                                            <th width='200'>Creation Date</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
 
-                                    <tbody>
-<?php $sql = "SELECT * from tblleavetype";
+                                <div class="row">
+                                    <form class="col s12" name="chngpwd" method="post">
+                                          <?php if($error){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php }
+                else if($msg){?><div class="succWrap"><strong>SUCCESS</strong> : <?php echo htmlentities($msg); ?> </div><?php }?>
+<?php
+$did=intval($_GET['obid']);
+$sql = "SELECT * from objects WHERE id=:did";
 $query = $dbh -> prepare($sql);
+$query->bindParam(':did',$did,PDO::PARAM_STR);
 $query->execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
 $cnt=1;
@@ -96,20 +94,41 @@ if($query->rowCount() > 0)
 {
 foreach($results as $result)
 {               ?>
-                                        <tr>
-                                            <td> <?php echo htmlentities($cnt);?></td>
-                                            <td><?php echo htmlentities($result->LeaveType);?></td>
-                                            <td><?php echo htmlentities($result->Description);?></td>
-                                            <td><?php echo htmlentities($result->CreationDate);?></td>
-                                            <td><a href="editleavetype.php?lid=<?php echo htmlentities($result->id);?>"><i class="material-icons">mode_edit</i></a>
-                                            <a href="manageleavetype.php?del=<?php echo htmlentities($result->id);?>" onclick="return confirm('Do you want to delete');"> <i class="material-icons">delete_forever</i></a> </td>
-                                        </tr>
-                                         <?php $cnt++;} }?>
-                                    </tbody>
-                                </table>
+
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="objectname" type="text"  class="validate" autocomplete="off" name="objectname" value="<?php echo htmlentities($result->object_name);?>"  required>
+                    <label for="objectname">Object Name</label>
+            </div>
+
+
+          <div class="input-field col s12">
+             <input id="description" type="text"  class="validate" autocomplete="off" value="<?php echo htmlentities($result->description);?>" name="description"  required>
+              <label for="description">Description</label>
+          </div>
+
+<?php }} ?>
+
+
+<div class="input-field col s12">
+<button type="submit" name="update" class="waves-effect waves-light btn indigo m-b-xs">UPDATE</button>
+
+</div>
+
+
+
+
+                                        </div>
+
+                                    </form>
+                                </div>
                             </div>
                         </div>
+
+
+
                     </div>
+
                 </div>
             </main>
 
